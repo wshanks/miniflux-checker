@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+  </head>
+
+  <body>
+    <table>
+      <tr>
+        <td>
+            <label>Miniflux URL </label> 
+        </td>
+        <td>
+          <input type="url" id="url" ></label>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+            <label>Miniflux username </label> 
+        </td>
+        <td>
+          <input type="text" id="username" ></label>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+            <label>Miniflux password </label> 
+        </td>
+        <td>
+          <input type="password" id="password" ></label>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+            <label>Update interval (minutes) </label> 
+        </td>
+        <td>
+          <input type="number" min="0.1" step="any" id="interval" ></label>
+        </td>
+      </tr>
+
+      <tr>
+        <td>
+            <label>Show desktop notifications </label> 
+        </td>
+        <td>
+          <input type="checkbox" id="notifications" ></label>
+        </td>
+      </tr>
+    </table>
+    <form>
+        <button type="submit">Save settings</button>
+    </form>
+
+    <script src="options.js"></script>
+
+  </body>
+</html>

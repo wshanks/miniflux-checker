@@ -1,5 +1,11 @@
-function sanitizeInterval(interval) {
-    return interval ? parseFloat(interval) : 5
+function sanitizeInterval(settings) {
+    var interval
+    if (settings.hasOwnProperty('interval')) {
+        interval = settings.interval
+    } else {
+        interval = ''
+    }
+    return interval ? parseFloat(interval) : 0.1
 }
 
 async function checkFeeds() {
@@ -18,22 +24,18 @@ async function checkFeeds() {
     request.send()
 }
 
-async function updateAlarm(interval) {
-    interval = sanitizeInterval(interval)
+async function calculateDelay(interval) {
     var alarm = await browser.alarms.get('miniflux-check')
 
-    if (alarm.periodInMinutes == interval) {
-        return
+    var newDelay
+    if (typeof alarm !== 'undefined') {
+        var currentDelay = (alarm.scheduledTime - Date.now()) / 60
+        newDelay = Math.max(interval - currentDelay, 0)
+    } else {
+        newDelay = 0
     }
 
-    var currentDelay = (alarm.scheduledTime - Date.now()) / 60
-    var newDelay = Math.max(interval - currentDelay, 0)
-
-    await browser.alarms.clear('miniflux-check')
-
-    browser.alarms.create('miniflux-check',
-                          {'delayInMinutes': newDelay,
-                           'periodInMinutes': interval})
+    return newDelay
 }
 
 function handleAlarm(alarm) {
@@ -43,10 +45,20 @@ function handleAlarm(alarm) {
 }
 
 async function setupAlarm() {
-    var info = await browser.storage.local.get(['interval'])
+    var loginInfo = ['url', 'username', 'password']
+    var settings = await browser.storage.local.get(['interval', ...loginInfo])
+
+    // Need all the login settings to run alarm
+    if (loginInfo.some(el => !settings[el])) {
+        return
+    }
+
+    var interval = sanitizeInterval(settings)
+    var delay = await calculateDelay(interval)
+
     browser.alarms.create('miniflux-check',
-                          {'delayInMinutes': 0,
-                           'periodInMinutes': sanitizeInterval(info.interval)})
+                          {'delayInMinutes': delay,
+                           'periodInMinutes': interval})
 }
 
 browser.browserAction.setBadgeBackgroundColor({'color': 'blue'})

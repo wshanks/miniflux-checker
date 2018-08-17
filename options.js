@@ -9,7 +9,7 @@ function saveOptions(e) {
     browser.storage.local.set(settings)
 
     var background = browser.extension.getBackgroundPage()
-    background.updateAlarm(settings.interval)
+    background.setupAlarm()
 }
 
 async function restoreOptions() {

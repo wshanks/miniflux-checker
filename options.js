@@ -6,7 +6,7 @@ function saveOptions(e) {
     var settings = {}
     var element
     for (let setting of optionNames) {
-        element = document.querySelector("#"+setting)
+        element = document.querySelector('#'+setting)
         if (element.type == 'checkbox') {
             settings[setting] = element.checked
         } else {
@@ -24,7 +24,7 @@ async function restoreOptions() {
 
     var element
     for (let setting in settings) {
-        element = document.querySelector("#"+setting)
+        element = document.querySelector('#'+setting)
         if (element.type == 'checkbox') {
             element.checked = settings[setting]
         } else {

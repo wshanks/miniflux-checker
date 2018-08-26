@@ -15,12 +15,14 @@ async function setDefaults() {
 
     var val
     for (let setting in defaults) {
-        if (settings[setting] === undefined) {
-            val = defaults[setting]
-        } else {
-            val = settings[setting]
+        if (defaults.hasOwnProperty(setting)) {
+            if (settings[setting] === undefined) {
+                val = defaults[setting]
+            } else {
+                val = settings[setting]
+            }
+            settings[setting] = val
         }
-        settings[setting] = val
     }
     browser.storage.local.set(settings)
 }
@@ -50,7 +52,7 @@ async function checkFeeds() {
         `&limit=${limit}&after_entry_id=${info.lastEntry}`
     var headers = new Headers()
     headers.append('Authorization', 'Basic ' + btoa(`${info.username}:${info.password}`))
-    var response = await fetch(url, {credentials: "include", headers: headers})
+    var response = await fetch(url, {credentials: 'include', headers: headers})
     var body = await response.json()
 
     browser.browserAction.setBadgeText({'text': `${body.total}`})
@@ -105,10 +107,10 @@ async function checkFeeds() {
                 iconUrl = 'icons/icon64.png'
             }
             browser.notifications.create('', {
-                "type": "basic",
-                "title": entry.feed.title,
-                "message": entry.title,
-                "iconUrl": iconUrl
+                'type': 'basic',
+                'title': entry.feed.title,
+                'message': entry.title,
+                'iconUrl': iconUrl
             })
         }
 
@@ -116,10 +118,10 @@ async function checkFeeds() {
             var msg = `${body.total - info.maxNotifications}` +
                 ' additional new feed items....'
             browser.notifications.create('', {
-                "type": "basic",
-                "title": 'Miniflux',
-                "message": msg,
-                "iconUrl": 'icons/icon64.png'
+                'type': 'basic',
+                'title': 'Miniflux',
+                'message': msg,
+                'iconUrl': 'icons/icon64.png'
             })
         }
     }
@@ -140,7 +142,7 @@ async function calculateDelay(interval) {
 }
 
 function handleAlarm(alarm) {
-    if (alarm.name == 'miniflux-check') {
+    if (alarm.name === 'miniflux-check') {
         checkFeeds()
     }
 }
@@ -158,8 +160,7 @@ async function setupAlarm() {
     var delay = await calculateDelay(interval)
 
     browser.alarms.create('miniflux-check',
-                          {'delayInMinutes': delay,
-                           'periodInMinutes': interval})
+        {'delayInMinutes': delay, 'periodInMinutes': interval})
 }
 
 setDefaults()

@@ -21,7 +21,6 @@ Usage notes
 * Notifications use the feed's favicon by default. In preferences, one can select to the Miniflux Checker icon for all notifications instead.
 * The last updated item's ID is stored internally. Only one notification should ever be shown for a given item.
   - This ID can be reset in the preferences in case the Miniflux account changes.
-  - Miniflux Checker uses the `last_entry_id` query parameter to filter out items prior to the last item ID it has seen. This query parameter was introduced in Miniflux 2.0.9. With earlier versions of Miniflux, this parameter does nothing, so notifications for all unread items will be shown each time Miniflux is checked, even if notifications had been shown before for those items.
 * The password is stored in the extension's local storage, effectively in clear text on the file system.
 
 Ideas for future features

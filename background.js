@@ -42,88 +42,101 @@ async function checkFeeds() {
         'url', 'username', 'password', 'lastEntry', 'notifications',
         'maxNotifications', 'useIcons'])
 
-    var limit
-    if (info.notifications) {
-        limit = info.maxNotifications
-    } else {
-        limit = 1
-    }
-    var url = info.url + '/v1/entries?status=unread&direction=desc' +
-        `&limit=${limit}&after_entry_id=${info.lastEntry}`
+    var url = info.url + '/v1/entries?status=unread&direction=desc'
     var headers = new Headers()
-    headers.append('Authorization', 'Basic ' + btoa(`${info.username}:${info.password}`))
+    headers.append('Authorization',
+        'Basic ' + btoa(`${info.username}:${info.password}`))
     var response = await fetch(url, {credentials: 'include', headers: headers})
     var body = await response.json()
 
     browser.browserAction.setBadgeText({'text': `${body.total}`})
 
-    var numEntries = body.entries.length
-    if (numEntries > 0) {
-        var lastEntry = Math.max(body.entries[0].id, info.lastEntry)
-        browser.storage.local.set({'lastEntry': lastEntry})
+    var previousLastEntry = info.lastEntry
+    if (body.total > 0) {
+        var lastEntry = info.lastEntry
+        for (let idx=0; idx<body.entries.length; idx++) {
+            lastEntry = Math.max(body.entries[idx].id, lastEntry)
+        }
+        if (lastEntry != info.lastEntry) {
+            browser.storage.local.set({'lastEntry': lastEntry})
+        }
     }
 
-    if (info.notifications && numEntries > 0) {
-        var numShow
-        if (numEntries > info.maxNotifications) {
-            numShow = info.maxNotifications - 1
-        } else {
-            numShow = numEntries
-        }
+    if (!info.notifications) {
+        return
+    }
 
-        var iconIds = []
-        var iconData = []
-        if (info.useIcons) {
-            for (let idx=numShow - 1; idx >= 0; idx--) {
-                let entry = body.entries[idx]
-                if (iconIds.includes(entry.feed_id)) {
-                    continue
-                }
+    var newEntries = []
+    for (let idx=0; idx<body.entries.length; idx++) {
+        if (body.entries[idx].id > previousLastEntry) {
+            newEntries.push(body.entries[idx])
+        }
+    }
 
-                if (entry.feed.icon) {
-                    iconIds.push(entry.feed_id)
-                    iconData.push(fetch(
-                        info.url + `/v1/feeds/${entry.feed_id}/icon`,
-                        {credentials: 'include', headers: headers}).
-                        then((response) => response.json()))
-                }
-            }
-        }
-        if (iconIds) {
-            iconData = await Promise.all(iconData)
-        }
-        var icons = {}
-        for (let idx=0; idx<iconIds.length; idx++) {
-            icons[iconIds[idx]] = iconData[idx].data
-        }
-        // icondIds.forEach((key, idx) => icons[key] = iconData[idx])
+    if (newEntries.length === 0) {
+        return
+    }
 
+    var numShow
+    if (newEntries.length > info.maxNotifications) {
+        numShow = info.maxNotifications - 1
+    } else {
+        numShow = newEntries.length
+    }
+
+    var iconIds = []
+    var iconData = []
+    if (info.useIcons) {
         for (let idx=numShow - 1; idx >= 0; idx--) {
-            let entry = body.entries[idx]
-            let iconUrl
-            if (icons.hasOwnProperty(entry.feed_id)) {
-                iconUrl = 'data:' + icons[entry.feed_id]
-            } else {
-                iconUrl = 'icons/icon64.png'
+            let entry = newEntries[idx]
+            if (iconIds.includes(entry.feed_id)) {
+                continue
             }
-            browser.notifications.create('', {
-                'type': 'basic',
-                'title': entry.feed.title,
-                'message': entry.title,
-                'iconUrl': iconUrl
-            })
-        }
 
-        if (body.total > info.maxNotifications) {
-            var msg = `${body.total - info.maxNotifications}` +
-                ' additional new feed items....'
-            browser.notifications.create('', {
-                'type': 'basic',
-                'title': 'Miniflux',
-                'message': msg,
-                'iconUrl': 'icons/icon64.png'
-            })
+            if (entry.feed.icon) {
+                iconIds.push(entry.feed_id)
+                iconData.push(fetch(
+                    info.url + `/v1/feeds/${entry.feed_id}/icon`,
+                    {credentials: 'include', headers: headers}).
+                    then((response) => response.json()))
+            }
         }
+    }
+    if (iconIds) {
+        iconData = await Promise.all(iconData)
+    }
+    var icons = {}
+    iconIds.forEach((key, idx) => icons[key] = iconData[idx].data)
+
+    for (let idx=numShow - 1; idx >= 0; idx--) {
+        let entry = newEntries[idx]
+        let iconUrl
+        if (icons.hasOwnProperty(entry.feed_id)) {
+            iconUrl = 'data:' + icons[entry.feed_id]
+        } else {
+            iconUrl = 'icons/icon64.png'
+        }
+        browser.notifications.create('', {
+            'type': 'basic',
+            'title': entry.feed.title,
+            'message': entry.title,
+            'iconUrl': iconUrl
+        })
+    }
+
+    if (newEntries.length > info.maxNotifications) {
+        var msg = `${newEntries.length - numShow}`
+        if (info.maxNotifications == 1) {
+            msg = msg + ' new feed items....'
+        } else {
+            msg = msg + ' additional new feed items....'
+        }
+        browser.notifications.create('', {
+            'type': 'basic',
+            'title': 'Miniflux',
+            'message': msg,
+            'iconUrl': 'icons/icon64.png'
+        })
     }
 }
 

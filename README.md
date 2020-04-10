@@ -8,7 +8,7 @@ Miniflux Checker is a Firefox WebExtension that tracks unread items in a [Minifl
 Setup
 -----
 1. Install Miniflux Checker either from its [addons.mozilla.org listing](https://addons.mozilla.org/en-US/firefox/addon/miniflux-checker/) or its [GitHub page](https://github.com/willsALMANJ/miniflux-checker).
-2. Open the extension's preferences page from Addons manager and set the Miniflux URL, username, and password. 
+2. Open the extension's preferences page from Addons manager and set the Miniflux URL and credentials. A token is preferred over username and password, see usage notes.
 3. Place the toolbar icon in a visible location if you want to see the number of unread items.
 
 Usage notes

@@ -1,5 +1,5 @@
 var optionNames = ['interval', 'lastEntry', 'maxNotifications',
-    'notifications', 'password', 'url', 'username', 'useIcons']
+    'notifications', 'password', 'url', 'username', 'useIcons', 'token']
 
 function saveOptions(e) {
     e.preventDefault()

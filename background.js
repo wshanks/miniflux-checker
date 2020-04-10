@@ -6,7 +6,8 @@ var defaults = {
     'password': '',
     'url': '',
     'username': '',
-    'useIcons': true
+    'useIcons': true,
+    'token': ''
 }
 
 async function setDefaults() {
@@ -40,12 +41,19 @@ function sanitizeInterval(settings) {
 async function checkFeeds() {
     var info = await browser.storage.local.get([
         'url', 'username', 'password', 'lastEntry', 'notifications',
-        'maxNotifications', 'useIcons'])
+        'maxNotifications', 'useIcons', 'token'])
 
     var url = info.url + '/v1/entries?status=unread&direction=desc'
+
     var headers = new Headers()
-    headers.append('Authorization',
-        'Basic ' + btoa(`${info.username}:${info.password}`))
+
+    if (info.token) {
+        headers.append('X-Auth-Token', info.token)
+    } else {
+        headers.append('Authorization',
+            'Basic ' + btoa(`${info.username}:${info.password}`))
+    }
+
     var response = await fetch(url, {credentials: 'include', headers: headers})
     var body = await response.json()
 

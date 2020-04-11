@@ -3,6 +3,12 @@
 <html>
   <head>
     <meta charset="utf-8">
+
+    <style>
+        input:invalid {
+          box-shadow: 0 0 5px 1px red;
+        }
+    </style>
   </head>
 
   <body>
@@ -18,7 +24,7 @@
             <label>Miniflux URL </label> 
         </td>
         <td>
-          <input type="url" id="url" ></label>
+          <input type="url" id="url" required pattern="^https?://\w.*">
         </td>
       </tr>
 
@@ -42,7 +48,7 @@
             <label>Miniflux username </label> 
         </td>
         <td>
-          <input type="text" id="username" ></label>
+          <input type="text" id="username" >
         </td>
       </tr>
 
@@ -51,7 +57,7 @@
             <label>Miniflux password </label> 
         </td>
         <td>
-          <input type="password" id="password" ></label>
+          <input type="password" id="password" >
         </td>
       </tr>
 
@@ -66,7 +72,7 @@
             <label>Update interval (minutes) </label> 
         </td>
         <td>
-          <input type="number" min="0.1" step="any" id="interval" ></label>
+          <input type="number" min="0.1" step="any" id="interval" >
         </td>
       </tr>
 
@@ -75,7 +81,7 @@
             <label>Show desktop notifications </label> 
         </td>
         <td>
-          <input type="checkbox" id="notifications" ></label>
+          <input type="checkbox" id="notifications" >
         </td>
       </tr>
 
@@ -93,7 +99,7 @@
             <label>Use feed icons in notifications </label> 
         </td>
         <td>
-          <input type="checkbox" id="useIcons" ></label>
+          <input type="checkbox" id="useIcons" >
         </td>
       </tr>
 
@@ -102,7 +108,7 @@
             <label>Latest item ID </label> 
         </td>
         <td>
-          <input type="number" min="0" id="lastEntry" readonly></label>
+          <input type="number" min="0" id="lastEntry" readonly>
         </td>
       </tr>
 

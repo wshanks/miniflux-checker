@@ -103,6 +103,15 @@ function testAPI(e) {
         })
 }
 
+let urlInput = document.getElementById("url")
+urlInput.addEventListener("input", function (event) {
+    if (urlInput.validity.patternMismatch) {
+        urlInput.setCustomValidity("Please enter a valid URL, including the protocol (e.g. http://).")
+    } else {
+        urlInput.setCustomValidity("")
+    }
+})
+
 document.addEventListener('DOMContentLoaded', restoreOptions)
 document.querySelector('#save').addEventListener('submit', saveOptions)
 document.querySelector('#reset-id').addEventListener('submit', resetID)

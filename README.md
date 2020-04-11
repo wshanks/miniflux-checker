@@ -21,7 +21,9 @@ Usage notes
 * Notifications use the feed's favicon by default. In preferences, one can select to the Miniflux Checker icon for all notifications instead.
 * The last updated item's ID is stored internally. Only one notification should ever be shown for a given item.
   - This ID can be reset in the preferences in case the Miniflux account changes.
-* The password is stored in the extension's local storage, effectively in clear text on the file system.
+* The token/password is stored in the extension's local storage, effectively in clear text on the file system.
+  - For this reason, using an API token is recommended since control over the account is not compromised if it is revealed.
+  - Tokens can be generated in the "API Keys" section of Miniflux's settings for Miniflux versions 2.0.21 and later.
 
 Ideas for future features
 -------------------------

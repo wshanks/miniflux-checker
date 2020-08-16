@@ -169,12 +169,21 @@ function handleAlarm(alarm) {
 }
 
 async function setupAlarm() {
-    var loginInfo = ['url', 'username', 'password']
-    var settings = await browser.storage.local.get(['interval', ...loginInfo])
+    var settingsKeys = ['interval', 'url', 'token', 'username', 'password']
+    var settings = await browser.storage.local.get(settingsKeys)
 
-    // Need non-empty values for all the login settings to run alarm
-    if (loginInfo.some(el => !settings[el])) {
+    // Need non-empty values for the login settings to run alarm
+
+    if (!settings['url']) {
+        console.warn('Miniflux refresh disabled due to no URL')
         return
+    }
+
+    if (!settings['token']) {
+        if (!settings['username'] || !settings['password']) {
+            console.warn('Miniflux refresh disabled due to no credentials')
+            return
+        }
     }
 
     var interval = sanitizeInterval(settings)

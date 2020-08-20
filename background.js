@@ -54,10 +54,23 @@ async function checkFeeds() {
             'Basic ' + btoa(`${info.username}:${info.password}`))
     }
 
-    var response = await fetch(url, {credentials: 'include', headers: headers})
+    let bad_request = false
+    try {
+        var response = await fetch(url, {credentials: 'include', headers: headers})
+    } catch(e) {
+        bad_request = true
+    }
+    if (bad_request || !response.ok) {
+        browser.browserAction.setBadgeText({'text': 'X'})
+        browser.browserAction.setBadgeBackgroundColor({color: 'red'})
+        browser.browserAction.setTitle({title: 'Miniflux Checker [Error connecting to Miniflux]'})
+        return
+    }
     var body = await response.json()
 
     browser.browserAction.setBadgeText({'text': `${body.total}`})
+    browser.browserAction.setBadgeBackgroundColor({color: 'blue'})
+    browser.browserAction.setTitle({title: 'Miniflux Checker'})
 
     var previousLastEntry = info.lastEntry
     if (body.total > 0) {
@@ -174,23 +187,32 @@ async function setupAlarm() {
 
     // Need non-empty values for the login settings to run alarm
 
+    let settings_good = true
     if (!settings['url']) {
         console.warn('Miniflux refresh disabled due to no URL')
-        return
+        settings_good = false
     }
 
     if (!settings['token']) {
         if (!settings['username'] || !settings['password']) {
             console.warn('Miniflux refresh disabled due to no credentials')
-            return
+            settings_good = false
         }
     }
 
-    var interval = sanitizeInterval(settings)
-    var delay = await calculateDelay(interval)
+    if (settings_good) {
+        browser.browserAction.enable()
+        var interval = sanitizeInterval(settings)
+        var delay = await calculateDelay(interval)
 
-    browser.alarms.create('miniflux-check',
-        {'delayInMinutes': delay, 'periodInMinutes': interval})
+        browser.alarms.create('miniflux-check',
+            {'delayInMinutes': delay, 'periodInMinutes': interval})
+    } else {
+        browser.browserAction.disable()
+        browser.alarms.clear('miniflux-check')
+        browser.browserAction.setBadgeText({text: ''})
+        browser.browserAction.setTitle({title: 'Miniflux Checker [Missing required settings]'})
+    }
 }
 
 async function onContextAction(actionInfo) {

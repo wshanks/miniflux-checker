@@ -222,6 +222,17 @@ async function onContextAction(actionInfo) {
             return
         }
         browser.tabs.create({url: `${settings.url}/unread`})
+    if (actionInfo.menuItemId === 'miniflux-add-feed') {
+        var settings = await browser.storage.local.get(['url'])
+        if (!settings.url) {
+            return
+        }
+        add_feed_url = settings.url + '/bookmarklet?uri='
+        current_url = await browser.tabs.executeScript({
+            code: `window.location.href;`,
+        })
+        current_uri = encodeURIComponent(current_url)
+        browser.tabs.create({ url: add_feed_url + current_uri })
     }
 }
 
@@ -235,5 +246,9 @@ browser.contextMenus.create({
     id: 'miniflux-show-unread',
     title: 'Show unread',
     contexts: ['browser_action']
+browser.contextMenus.create({
+    id: 'miniflux-add-feed',
+    title: 'Add Feed',
+    contexts: ['browser_action'],
 })
 browser.contextMenus.onClicked.addListener(info => onContextAction(info))

@@ -62,15 +62,15 @@ async function checkFeeds() {
     }
     if (bad_request || !response.ok) {
         browser.browserAction.setBadgeText({'text': 'X'})
-        browser.browserAction.setBadgeBackgroundColor({color: 'red'})
         browser.browserAction.setTitle({title: 'Miniflux Checker [Error connecting to Miniflux]'})
+        browser.browserAction.setBadgeBackgroundColor({ color: 'crimson' })
         return
     }
     var body = await response.json()
 
     browser.browserAction.setBadgeText({'text': `${body.total}`})
-    browser.browserAction.setBadgeBackgroundColor({color: 'blue'})
     browser.browserAction.setTitle({title: 'Miniflux Checker'})
+    browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 
     var previousLastEntry = info.lastEntry
     if (body.total > 0) {
@@ -222,6 +222,7 @@ async function onContextAction(actionInfo) {
             return
         }
         browser.tabs.create({url: `${settings.url}/unread`})
+    }
     if (actionInfo.menuItemId === 'miniflux-add-feed') {
         var settings = await browser.storage.local.get(['url'])
         if (!settings.url) {
@@ -237,18 +238,19 @@ async function onContextAction(actionInfo) {
 }
 
 setDefaults()
-browser.browserAction.setBadgeBackgroundColor({'color': 'blue'})
+browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 browser.browserAction.onClicked.addListener(checkFeeds)
 setupAlarm()
 browser.alarms.onAlarm.addListener(handleAlarm)
 
 browser.contextMenus.create({
     id: 'miniflux-show-unread',
-    title: 'Show unread',
+    title: 'Show Unread',
     contexts: ['browser_action']
+})
 browser.contextMenus.create({
     id: 'miniflux-add-feed',
     title: 'Add Feed',
-    contexts: ['browser_action'],
+    contexts: ['browser_action']
 })
 browser.contextMenus.onClicked.addListener(info => onContextAction(info))

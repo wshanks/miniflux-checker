@@ -68,12 +68,13 @@ async function checkFeeds() {
     }
     var body = await response.json()
 
-    browser.browserAction.setBadgeText({'text': `${body.total}`})
+    browser.browserAction.setBadgeText({'text': ''})
     browser.browserAction.setTitle({title: 'Miniflux Checker'})
     browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 
     var previousLastEntry = info.lastEntry
     if (body.total > 0) {
+        browser.browserAction.setBadgeText({'text': `${body.total}`})
         var lastEntry = info.lastEntry
         for (let idx=0; idx<body.entries.length; idx++) {
             lastEntry = Math.max(body.entries[idx].id, lastEntry)

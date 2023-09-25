@@ -239,6 +239,7 @@ async function onContextAction(actionInfo) {
 }
 
 setDefaults()
+checkFeeds()
 browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 browser.browserAction.onClicked.addListener(checkFeeds)
 setupAlarm()

@@ -62,18 +62,19 @@ async function checkFeeds() {
     }
     if (bad_request || !response.ok) {
         browser.browserAction.setBadgeText({'text': 'X'})
-        browser.browserAction.setBadgeBackgroundColor({color: 'red'})
         browser.browserAction.setTitle({title: 'Miniflux Checker [Error connecting to Miniflux]'})
+        browser.browserAction.setBadgeBackgroundColor({ color: 'crimson' })
         return
     }
     var body = await response.json()
 
-    browser.browserAction.setBadgeText({'text': `${body.total}`})
-    browser.browserAction.setBadgeBackgroundColor({color: 'blue'})
+    browser.browserAction.setBadgeText({'text': ''})
     browser.browserAction.setTitle({title: 'Miniflux Checker'})
+    browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 
     var previousLastEntry = info.lastEntry
     if (body.total > 0) {
+        browser.browserAction.setBadgeText({'text': `${body.total}`})
         var lastEntry = info.lastEntry
         for (let idx=0; idx<body.entries.length; idx++) {
             lastEntry = Math.max(body.entries[idx].id, lastEntry)
@@ -223,17 +224,35 @@ async function onContextAction(actionInfo) {
         }
         browser.tabs.create({url: `${settings.url}/unread`})
     }
+    if (actionInfo.menuItemId === 'miniflux-add-feed') {
+        var settings = await browser.storage.local.get(['url'])
+        if (!settings.url) {
+            return
+        }
+        add_feed_url = settings.url + '/bookmarklet?uri='
+        current_url = await browser.tabs.executeScript({
+            code: `window.location.href;`,
+        })
+        current_uri = encodeURIComponent(current_url)
+        browser.tabs.create({ url: add_feed_url + current_uri })
+    }
 }
 
 setDefaults()
-browser.browserAction.setBadgeBackgroundColor({'color': 'blue'})
+checkFeeds()
+browser.browserAction.setBadgeBackgroundColor({ color: 'royalblue' })
 browser.browserAction.onClicked.addListener(checkFeeds)
 setupAlarm()
 browser.alarms.onAlarm.addListener(handleAlarm)
 
 browser.contextMenus.create({
     id: 'miniflux-show-unread',
-    title: 'Show unread',
+    title: 'Show Unread',
+    contexts: ['browser_action']
+})
+browser.contextMenus.create({
+    id: 'miniflux-add-feed',
+    title: 'Add Feed',
     contexts: ['browser_action']
 })
 browser.contextMenus.onClicked.addListener(info => onContextAction(info))

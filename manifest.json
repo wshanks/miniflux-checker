@@ -36,5 +36,5 @@
     "page": "options.html"
   },
 
-  "permissions": ["alarms", "<all_urls>", "notifications", "storage", "contextMenus"]
+  "permissions": ["alarms", "<all_urls>", "notifications", "storage", "contextMenus", "activeTab"]
 }

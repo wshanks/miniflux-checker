@@ -1,5 +1,9 @@
 Miniflux Checker
 ================
+
+> [!WARNING]
+> Development has stopped due to lack of developer time. See the Miniflux Checker Plus continuation at https://github.com/kellylawrence/miniflux-checker-plus, also available on addons.mozilla.org [here](https://addons.mozilla.org/en-US/firefox/addon/miniflux-checker-plus/).
+
 Miniflux Checker is a Firefox WebExtension that tracks unread items in a [Miniflux RSS reader](https://miniflux.app) account. Specifically, it does the following:
 
 * Provides a toolbar icon that indicates the number of unread feed items
